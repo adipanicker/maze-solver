@@ -105,10 +105,8 @@ class MazeApp:
     def _toggle_fullscreen(self, event=None):
         self._fullscreen = not self._fullscreen
         self.root.attributes("-fullscreen", self._fullscreen)
-        if self._fullscreen:
-            self.root.resizable(False, False)
-        else:
-            self.root.resizable(False, False)
+        if hasattr(self, "fs_var"):
+            self.fs_var.set("⛶ Exit Fullscreen" if self._fullscreen else "⛶ Fullscreen")
         if self.maze:
             self.root.after(100, self._draw_grid)
 
@@ -116,7 +114,8 @@ class MazeApp:
         if self._fullscreen:
             self._fullscreen = False
             self.root.attributes("-fullscreen", False)
-            self.root.resizable(False, False)
+            if hasattr(self, "fs_var"):
+                self.fs_var.set("⛶ Fullscreen")
             if self.maze:
                 self.root.after(100, self._draw_grid)
 
@@ -143,6 +142,12 @@ class MazeApp:
                                    relief="flat", bd=0, cursor="hand2",
                                    command=self._toggle_theme)
         self.btn_theme.pack(side="left", padx=6)
+
+        self.fs_var = tk.StringVar(value="⛶ Fullscreen")
+        self.btn_fullscreen = tk.Button(toggles, textvariable=self.fs_var, font=self.font_small,
+                                        relief="flat", bd=0, cursor="hand2",
+                                        command=self._toggle_fullscreen)
+        self.btn_fullscreen.pack(side="left", padx=6)
 
         self.sound_var = tk.StringVar(value="🔊 Sound: ON")
         self.btn_sound = tk.Button(toggles, textvariable=self.sound_var, font=self.font_small,
@@ -171,7 +176,7 @@ class MazeApp:
 
         # ── Bottom area: controls + legend + education ──
         bottom = tk.Frame(self.root)
-        bottom.pack(fill="x", padx=20, pady=(0, 24))
+        bottom.pack(fill="x", padx=20, pady=(0, 16))
         self._build_controls(bottom)
         self._build_legend(bottom)
         self._build_education(bottom)
@@ -389,7 +394,7 @@ class MazeApp:
 
         # Buttons
         for btn in (self.btn_solve, self.btn_new, self.btn_reset,
-                     self.btn_theme, self.btn_sound, self.edu_toggle):
+                     self.btn_theme, self.btn_sound, self.btn_fullscreen, self.edu_toggle):
             btn.configure(bg=t["btn_bg"], fg=t["btn_fg"], activebackground=t["border"],
                           activeforeground=t["text"])
 
