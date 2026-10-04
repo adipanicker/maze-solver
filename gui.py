@@ -171,7 +171,7 @@ class MazeApp:
 
         # ── Bottom area: controls + legend + education ──
         bottom = tk.Frame(self.root)
-        bottom.pack(fill="x", padx=20, pady=(0, 8))
+        bottom.pack(fill="x", padx=20, pady=(0, 24))
         self._build_controls(bottom)
         self._build_legend(bottom)
         self._build_education(bottom)
@@ -237,6 +237,10 @@ class MazeApp:
         self.inspect_frame = tk.LabelFrame(sb, text=" Cell Inspector ", font=self.font_heading,
                                            labelanchor="nw", padx=12, pady=8)
         self.inspect_frame.pack(fill="x", pady=(0, 10))
+
+        # Helper text
+        self.inspect_helper = tk.Label(self.inspect_frame, text="Click any cell to inspect its A* values.", font=self.font_small, fg="#888", wraplength=200)
+        self.inspect_helper.pack(fill="x", pady=(0, 6))
 
         self.inspect_labels = {}
         for field in ("Row", "Column", "g(n)", "h(n)", "f(n)", "State"):
@@ -318,7 +322,7 @@ class MazeApp:
             lbl.pack(side="left", padx=2)
             self._legend_swatches[text] = (sw, lbl)
 
-    # -- Education panel ---
+     # -- Education panel ---
     def _build_education(self, parent):
         self._edu_expanded = False
 
@@ -535,8 +539,9 @@ class MazeApp:
                 elif cell == self.maze.goal:
                     fill = CELL_COLORS["goal"]
 
+                grid_colour = t.get("grid", CELL_COLORS["grid"])
                 c.create_rectangle(x1, y1, x2, y2, fill=fill,
-                                   outline=CELL_COLORS["grid"], tags=f"cell_{r}_{c_idx}")
+                                   outline=grid_colour, tags=f"cell_{r}_{c_idx}")
 
         # 4-5. letters on top
         self._draw_letter(self.maze.start, "S")
@@ -680,6 +685,9 @@ class MazeApp:
         self._algo_time = 0.0
         self.exec_time_str.set("0.00 ms")
 
+        if self.sound.enabled:
+            self.sound.play_search_tick()
+
         self._gen = astar(self.maze, self.maze.start, self.maze.goal)
         self._start_time = time.perf_counter()
         self._step()
@@ -701,9 +709,6 @@ class MazeApp:
             self.nodes_explored.set(n)
             # paint (start/goal stay green/red thanks to _paint_cell)
             self._paint_cell(cell, CELL_COLORS["explored"])
-            # throttled sound
-            if self.sound.enabled and n % SOUND_TICK_EVERY_N == 0:
-                self.sound.play_search_tick()
             self._anim_id = self.root.after(self.delay.get(), self._step)
         elif event == "done":
             self._finish(payload)
@@ -720,7 +725,8 @@ class MazeApp:
         self._update_status_colour()
         self.path_len.set(len(path) - 1)
         self._path_list = list(path)
-        self.sound.play_success()
+        if self.sound.enabled:
+            self.sound.play_success()
         self._animate_path(path, 0)
 
     def _animate_path(self, path, idx):
@@ -729,9 +735,6 @@ class MazeApp:
         cell = path[idx]
         self._path_set.add(cell)
         self._paint_cell(cell, CELL_COLORS["path"])
-        # soft ascending tone for path animation
-        if idx % 2 == 0:
-            self.sound.play_path_step()
         self._anim_id = self.root.after(self.delay.get(),
                                         lambda: self._animate_path(path, idx + 1))
 

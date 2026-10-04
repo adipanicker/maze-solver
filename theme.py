@@ -25,18 +25,20 @@ LIGHT = {
     "border":     "#e2e8f0",    # slate-200
     "btn_bg":     "#e2e8f0",
     "btn_fg":     "#1e293b",
+    "grid":       "#d1d5db",    # slate-300 — light grid lines
 }
 
 DARK = {
     "name":       "dark",
-    "bg":         "#0f172a",    # slate-900
+    "bg":         "#0b1120",    # deep navy, minimal blue tint
     "panel":      "#111827",    # gray-900
-    "text":       "#e2e8f0",    # slate-200
+    "text":       "#f8fafc",    # slate-50 — bright text
     "text_dim":   "#94a3b8",    # slate-400
-    "wall":       "#1e293b",    # slate-800
-    "empty":      "#334155",    # slate-700
-    "canvas_bg":  "#0f172a",
+    "wall":       "#020617",    # near-black — clearly distinct from unvisited
+    "empty":      "#263449",    # lighter dark slate — clearly distinct from wall
+    "canvas_bg":  "#0b1120",
     "border":     "#1e293b",
     "btn_bg":     "#1e293b",
-    "btn_fg":     "#e2e8f0",
+    "btn_fg":     "#f8fafc",
+    "grid":       "#475569",    # slate-600 — visible grid lines in dark mode
 }
